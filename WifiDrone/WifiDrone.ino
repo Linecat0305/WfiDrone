@@ -29,6 +29,14 @@ int mtBLp = ;
 int mtBRa = ;
 int mtBRb = ;
 int mtBRp = ;
+#define FLconst(5);
+#define FRconst(5);
+#define BLconst(5);
+#define BRconst(5);
+#define FLvar(1);
+#define FRvar(1);
+#define BLvar(1);
+#define BRvar(1);
 void op(String);
 void setup(){
 	pinMode(mtFLa , OUTPUT);
@@ -71,6 +79,36 @@ void setup(){
   Serial.print("http://");
   Serial.println(WiFi.localIP());
 }
+void op(String OP){
+  switch(OP){
+    case "F":
+      break;
+    case "B":
+      break;
+    case "L":
+      break;
+    case "R":
+      break;
+    case "FL":
+      break;
+    case "FR":
+      break;
+    case "BL":
+      break;
+    case "BR":
+      break;
+    case "UP":
+      break;
+    case "DN":
+      break;
+    case "LRo":
+      break;
+    case "RRo":
+      break;
+    case "S":
+      break;
+  }
+}
  
 void loop() {
 // If disconnected, try to reconnect every 30 seconds.
@@ -94,9 +132,6 @@ void loop() {
   if (req.indexOf("off12") != -1){digitalWrite(LED12, LOW);}
   if (req.indexOf("on14") != -1) {digitalWrite(LED14, HIGH);}
   if (req.indexOf("off14") != -1){digitalWrite(LED14, LOW);}
-           
-//////////////////////////////////////////////
-  // Página WEB. ////////////////////////////
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
   client.println(""); //  Comillas importantes.
