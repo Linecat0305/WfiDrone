@@ -1,10 +1,11 @@
+//example file, not for student use.
 #include <WiFi.h>
- 
-const char* ssid = "WifiXX";請輸入給你的編號
+
+const char* ssid = "Wifi20";//請輸入給你的編號
 const char* password = "WifiDrone8585";
 
 // Setting Static IP.
-        IPAddress local_IP(192, 168, 1, 1XX);//請輸入給你的編號
+        IPAddress local_IP(192, 168, 1, 120);//請輸入給你的編號
         IPAddress gateway(192, 168, 1, 1);
         IPAddress subnet(255, 255, 255, 0); 
         IPAddress primaryDNS(8, 8, 8, 8); //可選
@@ -14,39 +15,26 @@ WiFiServer server(80); // Port 80
 
 int wait30 = 30000; // 連線丟失時的等待時間 單位ms(30000ms=30s)
 //左前馬達
-int mtFLa = ;
-int mtFLb = ;
-int mtFLp = ;
+int mtFLp = 34;
 //右前馬達
-int mtFRa = ;
-int mtFRb = ;
-int mtFRp = ;
+int mtFRp = 35;
 //左後馬達
-int mtBLa = ;
-int mtBLb = ;
-int mtBLp = ;
+int mtBLp = 32;
 //右後馬達
-int mtBRa = ;
-int mtBRb = ;
-int mtBRp = ;
-#define FLconst(5);
-#define FRconst(5);
-#define BLconst(5);
-#define BRconst(5);
-#define FLvar(1);
-#define FRvar(1);
-#define BLvar(1);
-#define BRvar(1);
-void op(String);
+int mtBRp = 33;
+//四軸停滯基數（未調整）
+#define FLconst 5
+#define FRconst 5
+#define BLconst 5
+#define BRconst 5
+//四軸更動數（未調整）
+#define FLvar 1
+#define FRvar 1
+#define BLvar 1
+#define BRvar 1
+String OPS[] = {"F","B","L","R","FL","FR","BL","BR","UP","DN","LRo","RRo","S"};
+void op(int);
 void setup(){
-	pinMode(mtFLa , OUTPUT);
-  pinMode(mtFLb , OUTPUT);
-  pinMode(mtFRa , OUTPUT);
-  pinMode(mtFRb , OUTPUT);
-  pinMode(mtBLa , OUTPUT);
-  pinMode(mtBLb , OUTPUT);
-  pinMode(mtBRa , OUTPUT);
-  pinMode(mtBRb , OUTPUT);
   pinMode(mtFLp , OUTPUT);
   pinMode(mtFRp , OUTPUT);
   pinMode(mtBLp , OUTPUT);
@@ -79,33 +67,85 @@ void setup(){
   Serial.print("http://");
   Serial.println(WiFi.localIP());
 }
-void op(String OP){
+void op(int OP){
   switch(OP){
-    case "F":
+    case 0:
+      analogWrite(mtFLp,FLconst);
+      analogWrite(mtFRp,FRconst);
+      analogWrite(mtBLp,BLconst+BLvar);
+      analogWrite(mtBRp,BRconst+BRvar);
       break;
-    case "B":
+    case 1:
+      analogWrite(mtFLp,FLconst+FLvar);
+      analogWrite(mtFRp,FRconst+FRvar);
+      analogWrite(mtBLp,BLconst);
+      analogWrite(mtBRp,BRconst);
       break;
-    case "L":
+    case 2:
+      analogWrite(mtFLp,FLconst);
+      analogWrite(mtFRp,FRconst+FRvar);
+      analogWrite(mtBLp,BLconst);
+      analogWrite(mtBRp,BRconst+BRvar);
       break;
-    case "R":
+    case 3:
+      analogWrite(mtFLp,FLconst+FLvar);
+      analogWrite(mtFRp,FRconst);
+      analogWrite(mtBLp,BLconst+BLvar);
+      analogWrite(mtBRp,BRconst);
       break;
-    case "FL":
+    case 4:
+      analogWrite(mtFLp,FLconst-FLvar);
+      analogWrite(mtFRp,FRconst);
+      analogWrite(mtBLp,BLconst);
+      analogWrite(mtBRp,BRconst+BRvar);
       break;
-    case "FR":
+    case 5:
+      analogWrite(mtFLp,FLconst);
+      analogWrite(mtFRp,FRconst-FRvar);
+      analogWrite(mtBLp,BLconst+BLvar);
+      analogWrite(mtBRp,BRconst);
       break;
-    case "BL":
+    case 6:
+      analogWrite(mtFLp,FLconst);
+      analogWrite(mtFRp,FRconst+FRvar);
+      analogWrite(mtBLp,BLconst-BLvar);
+      analogWrite(mtBRp,BRconst);
       break;
-    case "BR":
+    case 7:
+      analogWrite(mtFLp,FLconst+FLvar);
+      analogWrite(mtFRp,FRconst);
+      analogWrite(mtBLp,BLconst);
+      analogWrite(mtBRp,BRconst-BRvar);
       break;
-    case "UP":
+    case 8:
+      analogWrite(mtFLp,FLconst+FLvar);
+      analogWrite(mtFRp,FRconst+FRvar);
+      analogWrite(mtBLp,BLconst+BLvar);
+      analogWrite(mtBRp,BRconst+BRvar);
       break;
-    case "DN":
+    case 9:
+      analogWrite(mtFLp,FLconst-FLvar);
+      analogWrite(mtFRp,FRconst-FRvar);
+      analogWrite(mtBLp,BLconst-BLvar);
+      analogWrite(mtBRp,BRconst-BRvar);
       break;
-    case "LRo":
+    case 10:
+      analogWrite(mtFLp,FLconst-FLvar);
+      analogWrite(mtFRp,FRconst+FRvar);
+      analogWrite(mtBLp,BLconst+BLvar);
+      analogWrite(mtBRp,BRconst-BRvar);
       break;
-    case "RRo":
+    case 11:
+      analogWrite(mtFLp,FLconst+FLvar);
+      analogWrite(mtFRp,FRconst-FRvar);
+      analogWrite(mtBLp,BLconst-BLvar);
+      analogWrite(mtBRp,BRconst+BRvar);
       break;
-    case "S":
+    case 12:
+      analogWrite(mtFLp,FLconst);
+      analogWrite(mtFRp,FRconst);
+      analogWrite(mtBLp,BLconst);
+      analogWrite(mtBRp,BRconst);
       break;
   }
 }
@@ -127,15 +167,15 @@ void loop() {
   Serial.print("New client: ");
   Serial.println(client.remoteIP());
   String req = client.readStringUntil('\r');
+  String OP = "S";
   Serial.println(req);
-  if (req.indexOf("on12") != -1) {digitalWrite(LED12, HIGH);}
-  if (req.indexOf("off12") != -1){digitalWrite(LED12, LOW);}
-  if (req.indexOf("on14") != -1) {digitalWrite(LED14, HIGH);}
-  if (req.indexOf("off14") != -1){digitalWrite(LED14, LOW);}
+  for(int i=0;i<sizeof(OPS)/sizeof(OPS[0]); i++){
+    if (req.indexOf(OPS[i]) != -1) {op(i);}
+    break;
+  }
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
   client.println(""); //  Comillas importantes.
-  client.println(estado); //  Return status.
 
   client.flush();
   client.stop();
