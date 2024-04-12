@@ -1,7 +1,7 @@
 //example file, not for student use.
 #include <WiFi.h>
 
-const char* ssid = "Wifi20";//請輸入給你的編號
+const char* ssid = "WifiXX";//請輸入給你的編號
 const char* password = "WifiDrone8585";
 
 // Setting Static IP.
@@ -15,13 +15,15 @@ WiFiServer server(80); // Port 80
 
 int wait30 = 30000; // 連線丟失時的等待時間 單位ms(30000ms=30s)
 //左前馬達
-int mtFLp = 34;
+int mtFLp = ;
 //右前馬達
-int mtFRp = 35;
+int mtFRp = ;
 //左後馬達
-int mtBLp = 32;
+int mtBLp = ;
 //右後馬達
-int mtBRp = 33;
+int mtBRp = ;
+//LED燈腳位
+int LEDpin = ;
 //四軸停滯基數（未調整）
 #define FLconst 5
 #define FRconst 5
@@ -70,82 +72,82 @@ void setup(){
 void op(int OP){
   switch(OP){
     case 0:
-      analogWrite(mtFLp,FLconst);
-      analogWrite(mtFRp,FRconst);
-      analogWrite(mtBLp,BLconst+BLvar);
-      analogWrite(mtBRp,BRconst+BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 1:
-      analogWrite(mtFLp,FLconst+FLvar);
-      analogWrite(mtFRp,FRconst+FRvar);
-      analogWrite(mtBLp,BLconst);
-      analogWrite(mtBRp,BRconst);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 2:
-      analogWrite(mtFLp,FLconst);
-      analogWrite(mtFRp,FRconst+FRvar);
-      analogWrite(mtBLp,BLconst);
-      analogWrite(mtBRp,BRconst+BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 3:
-      analogWrite(mtFLp,FLconst+FLvar);
-      analogWrite(mtFRp,FRconst);
-      analogWrite(mtBLp,BLconst+BLvar);
-      analogWrite(mtBRp,BRconst);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 4:
-      analogWrite(mtFLp,FLconst-FLvar);
-      analogWrite(mtFRp,FRconst);
-      analogWrite(mtBLp,BLconst);
-      analogWrite(mtBRp,BRconst+BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 5:
-      analogWrite(mtFLp,FLconst);
-      analogWrite(mtFRp,FRconst-FRvar);
-      analogWrite(mtBLp,BLconst+BLvar);
-      analogWrite(mtBRp,BRconst);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 6:
-      analogWrite(mtFLp,FLconst);
-      analogWrite(mtFRp,FRconst+FRvar);
-      analogWrite(mtBLp,BLconst-BLvar);
-      analogWrite(mtBRp,BRconst);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 7:
-      analogWrite(mtFLp,FLconst+FLvar);
-      analogWrite(mtFRp,FRconst);
-      analogWrite(mtBLp,BLconst);
-      analogWrite(mtBRp,BRconst-BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 8:
-      analogWrite(mtFLp,FLconst+FLvar);
-      analogWrite(mtFRp,FRconst+FRvar);
-      analogWrite(mtBLp,BLconst+BLvar);
-      analogWrite(mtBRp,BRconst+BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 9:
-      analogWrite(mtFLp,FLconst-FLvar);
-      analogWrite(mtFRp,FRconst-FRvar);
-      analogWrite(mtBLp,BLconst-BLvar);
-      analogWrite(mtBRp,BRconst-BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 10:
-      analogWrite(mtFLp,FLconst-FLvar);
-      analogWrite(mtFRp,FRconst+FRvar);
-      analogWrite(mtBLp,BLconst+BLvar);
-      analogWrite(mtBRp,BRconst-BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 11:
-      analogWrite(mtFLp,FLconst+FLvar);
-      analogWrite(mtFRp,FRconst-FRvar);
-      analogWrite(mtBLp,BLconst-BLvar);
-      analogWrite(mtBRp,BRconst+BRvar);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
     case 12:
-      analogWrite(mtFLp,FLconst);
-      analogWrite(mtFRp,FRconst);
-      analogWrite(mtBLp,BLconst);
-      analogWrite(mtBRp,BRconst);
+      analogWrite(mtFLp,FLconst);//控制左前馬達
+      analogWrite(mtFRp,FRconst);//控制右前馬達
+      analogWrite(mtBLp,BLconst);//控制左後馬達
+      analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
   }
 }
@@ -169,10 +171,9 @@ void loop() {
   String req = client.readStringUntil('\r');
   String OP = "S";
   Serial.println(req);
-  for(int i=0;i<sizeof(OPS)/sizeof(OPS[0]); i++){
-    if (req.indexOf(OPS[i]) != -1) {op(i);}
-    break;
-  }
+  //這裡缺了點東西
+    if (req.indexOf(XXX) != -1) {XXX}
+  //這裡缺了點東西
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
   client.println(""); //  Comillas importantes.
