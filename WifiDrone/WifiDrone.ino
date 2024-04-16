@@ -1,5 +1,6 @@
 //example file, not for student use.
 #include <WiFi.h>
+#include <esp_http_client.h>
 
 const char* ssid = "WifiXX";//請輸入給你的編號
 const char* password = "WifiDrone8585";
@@ -41,6 +42,7 @@ void setup(){
   pinMode(mtFRp , OUTPUT);
   pinMode(mtBLp , OUTPUT);
   pinMode(mtBRp , OUTPUT);
+  pinMode(LEDpin , OUTPUT);
   Serial.begin(115200);
 // 設定ip
   if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
@@ -67,83 +69,83 @@ void setup(){
   // This is IP
   Serial.print("This is IP to connect to the WebServer: ");
   Serial.print("http://");
-  Serial.println(WiFi.localIP());
+  Serial.print(WiFi.localIP());
 }
 void op(int OP){
   switch(OP){
-    case 0:
+    case 0://前
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 1:
+    case 1://後
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 2:
+    case 2://左
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 3:
+    case 3://右
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 4:
+    case 4://左前
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 5:
+    case 5://右前
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 6:
+    case 6://左後
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 7:
+    case 7://右後
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 8:
+    case 8://上升
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 9:
+    case 9://下降
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 10:
+    case 10://左旋
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 11:
+    case 11://右旋
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
       analogWrite(mtBRp,BRconst);//控制右後馬達
       break;
-    case 12:
+    case 12://滯停
       analogWrite(mtFLp,FLconst);//控制左前馬達
       analogWrite(mtFRp,FRconst);//控制右前馬達
       analogWrite(mtBLp,BLconst);//控制左後馬達
@@ -153,14 +155,14 @@ void op(int OP){
 }
  
 void loop() {
-// If disconnected, try to reconnect every 30 seconds.
+// 每30秒重新連線一次
   if ((WiFi.status() != WL_CONNECTED) && (millis() > wait30)) {
     Serial.println("Trying to reconnect WiFi...");
     WiFi.disconnect();
     WiFi.begin(ssid, password);
     wait30 = millis() + 30000;
   } 
-  // Check if a client has connected..
+  // 檢查連線狀況
   WiFiClient client = server.available();
   if (!client) {
     return;
@@ -171,9 +173,9 @@ void loop() {
   String req = client.readStringUntil('\r');
   String OP = "S";
   Serial.println(req);
-  //這裡缺了點東西
+  //這裡缺了點東西，請幫我填補它
     if (req.indexOf(XXX) != -1) {XXX}
-  //這裡缺了點東西
+  //這裡缺了點東西，請幫我填補它
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
   client.println(""); //  Comillas importantes.
