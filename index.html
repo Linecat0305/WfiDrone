@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="cn-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controller</title>
+    <style>
+        .countroller_rows{
+            display: flex;
+            width: 200px;
+            justify-content:space-between;
+        }
+        .countroller_box{
+            margin: 30px;
+            display: flex;
+            flex-direction:column;
+            justify-content:space-between;
+            width: 200px;
+            height: 200px;
+        }
+        .button{
+            width: 60px;
+            height: 60px;
+        }
+        #controller{
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content:space-between;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; justify-content: space-around;">
+        <button id="menu" onclick="fetch('http\://192.168.4.1/S', {method: 'GET'})">
+            <p style="margin: 0;">---------</p>
+            <p style="margin: 0;">---------</p>
+            <p style="margin: 0;">---------</p>
+        </button>
+    </div>
+    <div id="controller">
+        <div class="countroller_box" id="left-controller">
+            <div class="countroller_rows">
+                <button id="FL" class="button" onclick="fetch('http\://192.168.4.1/FL', {method: 'GET'})">Front-Left</button>
+                <button id="F" class="button"  onclick="fetch('http\://192.168.4.1/F', {method: 'GET'})">Front</button>
+                <button id="FR" class="button" onclick="fetch('http\://192.168.4.1/FR', {method: 'GET'})">Front-Right</button>
+            </div>
+            <div class="countroller_rows">
+                <button id="L" class="button" onclick="fetch('http\://192.168.4.1/L', {method: 'GET'})">Left</button>
+                <div class="button"></div>
+                <button id="R" class="button" onclick="fetch('http\://192.168.4.1/R', {method: 'GET'})">Right</button>
+            </div>
+            <div class="countroller_rows">
+                <button id="BL" class="button" onclick="fetch('http\://192.168.4.1/BL', {method: 'GET'})">back-Left</button>
+                <button id="B" class="button"  onclick="fetch('http\://192.168.4.1/B', {method: 'GET'})">back</button>
+                <button id="BR" class="button" onclick="fetch('http\://192.168.4.1/BR', {method: 'GET'})">back-Right</button>
+            </div>
+        </div>
+        <div class="countroller_box" id="right-controller">
+            <div class="countroller_rows">
+                <div class="button"></div>
+                <button id="UP" class="button" onclick="fetch('http\://192.168.4.1/UP', {method: 'GET'})">Up</button>
+                <div class="button"></div>
+            </div>
+            <div class="countroller_rows">
+                <button id="LRo" class="button" onclick="fetch('http\://192.168.4.1/LRo', {method: 'GET'})">Left-turn</button>
+                <div class="button"></div>
+                <button id="RRo" class="button" onclick="fetch('http\://192.168.4.1/RRo', {method: 'GET'})">Right-turn</button>
+            </div>
+            <div class="countroller_rows">
+                <div class="button"></div>
+                <button id="DN" class="button" onclick="fetch('http\://192.168.4.1/DN', {method: 'GET'})">Down</button>
+                <div class="button"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

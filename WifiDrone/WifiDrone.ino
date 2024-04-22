@@ -1,186 +1,104 @@
-//example file, not for student use.
 #include <WiFi.h>
-#include <esp_http_client.h>
+#include <WebServer.h>
 
-const char* ssid = "WifiXX";//請輸入給你的編號
-const char* password = "WifiDrone8585";
+const char *ssid = "ESP32_Router";
+const char *password = "12345678";
 
-// Setting Static IP.
-        IPAddress local_IP(192, 168, 1, 120);//請輸入給你的編號
-        IPAddress gateway(192, 168, 1, 1);
-        IPAddress subnet(255, 255, 255, 0); 
-        IPAddress primaryDNS(8, 8, 8, 8); //可選
-        IPAddress secondaryDNS(8, 8, 4, 4); //可選
+int PWM[4] = { 200, 200, 200, 200 };
 
-WiFiServer server(80); // Port 80
+int dP[4] = { 200, 200, 200, 200 };//default PWM
 
-int wait30 = 30000; // 連線丟失時的等待時間 單位ms(30000ms=30s)
-//左前馬達
-int mtFLp = ;
-//右前馬達
-int mtFRp = ;
-//左後馬達
-int mtBLp = ;
-//右後馬達
-int mtBRp = ;
-//LED燈腳位
-int LEDpin = ;
-//四軸停滯基數（未調整）
-#define FLconst 5
-#define FRconst 5
-#define BLconst 5
-#define BRconst 5
-//四軸更動數（未調整）
-#define FLvar 1
-#define FRvar 1
-#define BLvar 1
-#define BRvar 1
-String OPS[] = {"F","B","L","R","FL","FR","BL","BR","UP","DN","LRo","RRo","S"};
-void op(int);
-void setup(){
-  pinMode(mtFLp , OUTPUT);
-  pinMode(mtFRp , OUTPUT);
-  pinMode(mtBLp , OUTPUT);
-  pinMode(mtBRp , OUTPUT);
-  pinMode(LEDpin , OUTPUT);
+int aP = 20;//add PWM
+
+//pin         RF  RB  LB  LF
+int mot[4] = { 10, 10, 10, 10 };
+
+WebServer server(8585);  // 修改端口為8585
+
+void setup() {
   Serial.begin(115200);
-// 設定ip
-  if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
-    Serial.println("Error in settings.");
-  }
+  WiFi.softAP(ssid, password);
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("IP:");
+  Serial.println(IP);
+  server.on("/fly", HTTP_GET, handleFLY);
 
-// Connect WiFi net.
-  Serial.println();
-  Serial.print("Connecting with ");
-  Serial.println(ssid);
- 
-  WiFi.begin(ssid, password);
- 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print("...");
-  }
-  Serial.println("Connected.");
- 
-  // Start Web Server.
+  // 啟動伺服器
   server.begin();
-  Serial.println("Web Server started.");
- 
-  // This is IP
-  Serial.print("This is IP to connect to the WebServer: ");
-  Serial.print("http://");
-  Serial.print(WiFi.localIP());
+  Serial.println("HTTP server started");
 }
-void op(int OP){
-  switch(OP){
-    case 0://前
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 1://後
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 2://左
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 3://右
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 4://左前
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 5://右前
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 6://左後
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 7://右後
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 8://上升
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 9://下降
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 10://左旋
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 11://右旋
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
-    case 12://滯停
-      analogWrite(mtFLp,FLconst);//控制左前馬達
-      analogWrite(mtFRp,FRconst);//控制右前馬達
-      analogWrite(mtBLp,BLconst);//控制左後馬達
-      analogWrite(mtBRp,BRconst);//控制右後馬達
-      break;
+
+void loop() {
+  // 處理客戶端的請求
+  server.handleClient();
+  for (int i = 0; i < 4; i++) {
+    analogWrite(mot[i], PWM[i]);
   }
 }
- 
-void loop() {
-// 每30秒重新連線一次
-  if ((WiFi.status() != WL_CONNECTED) && (millis() > wait30)) {
-    Serial.println("Trying to reconnect WiFi...");
-    WiFi.disconnect();
-    WiFi.begin(ssid, password);
-    wait30 = millis() + 30000;
-  } 
-  // 檢查連線狀況
-  WiFiClient client = server.available();
-  if (!client) {
+
+// 處理根路由的函數
+void handleRoot() {
+  server.send(200, "text/plain", "Hello from ESP32 Router!");
+}
+
+// 處理LF路由的函數
+void handleFLY() {
+  // 如果是正確的 URL，設置 pin1 為 HIGH
+  String url = server.uri();
+  url.remove(0, 4);
+
+  int x[4];  // 将数组定义移到 if-else 语句之前
+
+  if (url.substring(0, 2) == "/F") {
+    url.remove(0, 2);
+    x[0] = default_
+    x[1] = add_PWM;
+    x[2] = add_PWM;
+    x[3] = -add_PWM;
+    server.send(200, "text/plain", "前進");
+  } else if (url.substring(0, 2) == "/B") {
+    url.remove(0, 2);
+    x[0] = add_PWM;
+    x[1] = -add_PWM;
+    x[2] = -add_PWM;
+    x[3] = add_PWM;
+    server.send(200, "text/plain", "後退");
+  } else if (url.substring(0,3) == "/UP") {
+    url.remove(0, 3);
+    x[0] = +add_PWM;
+    x[1] = +add_PWM;
+    x[2] = +add_PWM;
+    x[3] = +add_PWM;
+    server.send(200, "text/plain", "上升");
+  }else if (url.substring(0,3) == "/DN") {
+    url.remove(0, 3);
+    x[0] = add_PWM;
+    x[1] = -add_PWM;
+    x[2] = -add_PWM;
+    x[3] = add_PWM;
+    server.send(200, "text/plain", "下降");
+  }
+  }else{
+    server.send(404, "text/plain", "找不到此操作");
     return;
   }
-   
-  Serial.print("New client: ");
-  Serial.println(client.remoteIP());
-  String req = client.readStringUntil('\r');
-  String OP = "S";
-  Serial.println(req);
-  //這裡缺了點東西，請幫我填補它
-    if (req.indexOf(XXX) != -1) {XXX}
-  //這裡缺了點東西，請幫我填補它
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println(""); //  Comillas importantes.
+  changePWM(url, x);
+}
 
-  client.flush();
-  client.stop();
-  Serial.println("Client disconnected.");
+
+
+
+void changePWM(String url, int n[4]) {
+  int x = 1;
+  if (url == "/up") {
+    x = -1;
+  }
+  for (int i = 0; i < 4; i++) {
+    if (n[i] > 50 || n[i] < -50) {
+      server.send(500, "text/plain", "PWM調整過度");
+      return;
+    } else {
+      PWM[i] += n[i] * x;
+    }
+  }
 }
