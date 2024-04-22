@@ -1,104 +1,224 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-const char *ssid = "ESP32_Router";
-const char *password = "12345678";
+const char ssid[] = "WifiEX";
+const char password[] = "WifiDrone8585";
 
-int PWM[4] = { 200, 200, 200, 200 };
-
-int dP[4] = { 200, 200, 200, 200 };//default PWM
-
-int aP = 20;//add PWM
-
-//pin         RF  RB  LB  LF
-int mot[4] = { 10, 10, 10, 10 };
-
-WebServer server(8585);  // 修改端口為8585
-
+// Setting Static IP.
+IPAddress local_IP(192, 168, 1, 120);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress primaryDNS(8, 8, 8, 8);    //可選
+IPAddress secondaryDNS(8, 8, 4, 4);  //可選
+WebServer server(80);                // 建立一個 WebServer 物件，監聽在 80 port
+//左前馬達
+int mtFLp = 34;
+//右前馬達
+int mtFRp = 35;
+//左後馬達
+int mtBLp = 32;
+//右後馬達
+int mtBRp = 33;
+//LED燈腳位
+int LEDpin = 13;
+//四軸停滯基數（未調整）
+#define FLconst 200
+#define FRconst 200
+#define BLconst 200
+#define BRconst 200
+//四軸更動數（未調整）
+#define FLvar 50
+#define FRvar 50
+#define BLvar 50
+#define BRvar 50
 void setup() {
+  pinMode(mtFLp, OUTPUT);
+  pinMode(mtFRp, OUTPUT);
+  pinMode(mtBLp, OUTPUT);
+  pinMode(mtBRp, OUTPUT);
+  pinMode(LEDpin, OUTPUT);
   Serial.begin(115200);
-  WiFi.softAP(ssid, password);
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("IP:");
-  Serial.println(IP);
-  server.on("/fly", HTTP_GET, handleFLY);
 
-  // 啟動伺服器
+  // 設定 ESP32 為 AP 模式
+  WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS);
+  WiFi.softAP(ssid, password);
+
+
+  IPAddress IP = WiFi.softAPIP();  // 取得 ESP32 AP 的 IP 地址
+  Serial.print("AP IP address: ");
+  Serial.println(IP);
+
+  // 設定 WebServer 路由
+  server.on("/", handleRoot);  // 設定根路徑的處理函式
+  server.on("/F", Front);
+  server.on("/B", B);
+  server.on("/L", L);
+  server.on("/R", R);
+  server.on("/FL", FL);
+  server.on("/FR", FR);
+  server.on("/BL", BL);
+  server.on("/BR", BackRight);
+  server.on("/UP", UP);
+  server.on("/DN", DN);
+  server.on("/LRo", LRo);
+  server.on("/RRo", RRo);
+  server.on("/S", S);
+
+  // 開始 WebServer
   server.begin();
   Serial.println("HTTP server started");
 }
 
 void loop() {
-  // 處理客戶端的請求
-  server.handleClient();
-  for (int i = 0; i < 4; i++) {
-    analogWrite(mot[i], PWM[i]);
-  }
+  server.handleClient();  // 處理網路請求
 }
 
-// 處理根路由的函數
+// 處理根路徑的請求
 void handleRoot() {
-  server.send(200, "text/plain", "Hello from ESP32 Router!");
+  String html = "<!DOCTYPE html>";
+html+="<html lang=\"zh-TW\">";
+html+="<head>";
+    html+="<meta charset=\"UTF-8\">";
+    html+="<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+    html+="<title>Controller</title>";
+    html+="<style>";
+        html+=".countroller_rows{display: flex;width: 200px;justify-content:space-between;}";
+        html+=".countroller_box{margin: 30px;display: flex;flex-direction:column;justify-content:space-between;width: 200px;height: 200px;}";
+        html+=".button{width: 60px;height: 60px;}";
+        html+=".controller{position: fixed;bottom: 0;width: 100%;display: flex;justify-content:space-between;}";
+    html+="</style>";
+html+="</head>";
+html+="<body>";
+    html+="<div style=\"display: flex; justify-content: space-around;\">";
+        html+="<button id=\"menu\" onclick=\"fetch(\'http\://192.168.4.1/S\', {method: \'GET\'})\">";
+            html+="<p style=\"margin: 0;\">---------</p>";
+            html+="<p style=\"margin: 0;\">---------</p>";
+            html+="<p style=\"margin: 0;\">---------</p>";
+        html+="</button>";
+    html+="</div>";
+    html+="<div class=\"controller\">";
+        html+="<div class=\"countroller_box\" id=\"left-controller\">";
+            html+="<div class=\"countroller_rows\">";
+                html+="<button id=\"FL\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/FL\', {method: \'GET\'})\">Front-Left</button>";
+                html+="<button id=\"F\" class=\"button\"  onclick=\"fetch(\'http\://192.168.4.1/F\', {method: \'GET\'})\">Front</button>";
+                html+="<button id=\"FR\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/FR\', {method: \'GET\'})\">Front-Right</button>";
+            html+="</div>";
+            html+="<div class=\"countroller_rows\">";
+                html+="<button id=\"L\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/L\', {method: \'GET\'})\">Left</button>";
+                html+="<div class=\"button\"></div>";
+                html+="<button id=\"R\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/R\', {method: \'GET\'})\">Right</button>";
+            html+="</div>";
+            html+="<div class=\"countroller_rows\">";
+                html+="<button id=\"BL\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/BL\', {method: \'GET\'})\">back-Left</button>";
+                html+="<button id=\"B\" class=\"button\"  onclick=\"fetch(\'http\://192.168.4.1/B\', {method: \'GET\'})\">back</button>";
+                html+="<button id=\"BR\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/BR\', {method: \'GET\'})\">back-Right</button>";
+            html+="</div>";
+        html+="</div>";
+        html+="<div class=\"countroller_box\" id=\"right-controller\">";
+            html+="<div class=\"countroller_rows\">";
+                html+="<div class=\"button\"></div>";
+                html+="<button id=\"UP\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/UP\', {method: \'GET\'})\">Up</button>";
+                html+="<div class=\"button\"></div>";
+            html+="</div>";
+            html+="<div class=\"countroller_rows\">";
+                html+="<button id=\"LRo\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/LRo\', {method: \'GET\'})\">Left-turn</button>";
+                html+="<div class=\"button\"></div>";
+                html+="<button id=\"RRo\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/RRo\', {method: \'GET\'})\">Right-turn</button>";
+            html+="</div>";
+            html+="<div class=\"countroller_rows\">";
+                html+="<div class=\"button\"></div>";
+                html+="<button id=\"DN\" class=\"button\" onclick=\"fetch(\'http\://192.168.4.1/DN\', {method: \'GET\'})\">Down</button>";
+                html+="<div class=\"button\"></div>";
+            html+="</div>";
+        html+="</div>";
+    html+="</div>";
+html+="</body>";
+html+="</html>";
+  server.send(200, "text/html", html);
 }
-
-// 處理LF路由的函數
-void handleFLY() {
-  // 如果是正確的 URL，設置 pin1 為 HIGH
-  String url = server.uri();
-  url.remove(0, 4);
-
-  int x[4];  // 将数组定义移到 if-else 语句之前
-
-  if (url.substring(0, 2) == "/F") {
-    url.remove(0, 2);
-    x[0] = default_
-    x[1] = add_PWM;
-    x[2] = add_PWM;
-    x[3] = -add_PWM;
-    server.send(200, "text/plain", "前進");
-  } else if (url.substring(0, 2) == "/B") {
-    url.remove(0, 2);
-    x[0] = add_PWM;
-    x[1] = -add_PWM;
-    x[2] = -add_PWM;
-    x[3] = add_PWM;
-    server.send(200, "text/plain", "後退");
-  } else if (url.substring(0,3) == "/UP") {
-    url.remove(0, 3);
-    x[0] = +add_PWM;
-    x[1] = +add_PWM;
-    x[2] = +add_PWM;
-    x[3] = +add_PWM;
-    server.send(200, "text/plain", "上升");
-  }else if (url.substring(0,3) == "/DN") {
-    url.remove(0, 3);
-    x[0] = add_PWM;
-    x[1] = -add_PWM;
-    x[2] = -add_PWM;
-    x[3] = add_PWM;
-    server.send(200, "text/plain", "下降");
-  }
-  }else{
-    server.send(404, "text/plain", "找不到此操作");
-    return;
-  }
-  changePWM(url, x);
+void Front() {
+  analogWrite(mtFLp, FLconst);
+  analogWrite(mtFRp, FRconst);
+  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtBRp, BRconst + BRvar);
+  Serial.println("F");
+  digitalWrite(13,HIGH);
+  delay(1000);
 }
-
-
-
-
-void changePWM(String url, int n[4]) {
-  int x = 1;
-  if (url == "/up") {
-    x = -1;
-  }
-  for (int i = 0; i < 4; i++) {
-    if (n[i] > 50 || n[i] < -50) {
-      server.send(500, "text/plain", "PWM調整過度");
-      return;
-    } else {
-      PWM[i] += n[i] * x;
-    }
-  }
+void B() {
+  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtBLp, BLconst);
+  analogWrite(mtBRp, BRconst);
+  Serial.println("B");
+}
+void L() {
+  analogWrite(mtFLp, FLconst);
+  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtBLp, BLconst);
+  analogWrite(mtBRp, BRconst + BRvar);
+  Serial.println("L");
+}
+void R() {
+  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFRp, FRconst);
+  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtBRp, BRconst);
+  Serial.println("R");
+}
+void FL() {
+  analogWrite(mtFLp, FLconst - FLvar);
+  analogWrite(mtFRp, FRconst);
+  analogWrite(mtBLp, BLconst);
+  analogWrite(mtBRp, BRconst + BRvar);
+}
+void FR() {
+  analogWrite(mtFLp, FLconst);
+  analogWrite(mtFRp, FRconst - FRvar);
+  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtBRp, BRconst);
+}
+void BL() {
+  analogWrite(mtFLp, FLconst);
+  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtBLp, BLconst - BLvar);
+  analogWrite(mtBRp, BRconst);
+}
+void BackRight() {
+  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFRp, FRconst);
+  analogWrite(mtBLp, BLconst);
+  analogWrite(mtBRp, BRconst - BRvar);
+}
+void UP() {
+  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtBRp, BRconst + BRvar);
+}
+void DN() {
+  analogWrite(mtFLp, FLconst - FLvar);
+  analogWrite(mtFRp, FRconst - FRvar);
+  analogWrite(mtBLp, BLconst - BLvar);
+  analogWrite(mtBRp, BRconst - BRvar);
+}
+void LRo() {
+  analogWrite(mtFLp, FLconst - FLvar);
+  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtBRp, BRconst - BRvar);
+}
+void RRo() {
+  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFRp, FRconst - FRvar);
+  analogWrite(mtBLp, BLconst - BLvar);
+  analogWrite(mtBRp, BRconst + BRvar);
+}
+void S() {
+  analogWrite(mtFLp, FLconst);
+  analogWrite(mtFRp, FRconst);
+  analogWrite(mtBLp, BLconst);
+  analogWrite(mtBRp, BRconst);
+  digitalWrite(13,LOW);
+  delay(1000);
 }
