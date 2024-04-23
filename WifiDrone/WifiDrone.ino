@@ -12,6 +12,16 @@ IPAddress primaryDNS(8, 8, 8, 8);    //可選
 IPAddress secondaryDNS(8, 8, 4, 4);  //可選
 WebServer server(85);                // 建立一個 WebServer 物件，監聽在 85 port
 //一堆定義不用理會
+/*
+F:front
+B:back
+L:left
+R:right
+Ro:Rotate
+UP:up
+DN:down
+S:Stop
+*/
 //左前馬達
 int mtFLp = 34;
 //右前馬達
