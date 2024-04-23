@@ -10,7 +10,8 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);    //可選
 IPAddress secondaryDNS(8, 8, 4, 4);  //可選
-WebServer server(80);                // 建立一個 WebServer 物件，監聽在 80 port
+WebServer server(85);                // 建立一個 WebServer 物件，監聽在 85 port
+//一堆定義不用理會
 //左前馬達
 int mtFLp = 34;
 //右前馬達
@@ -21,16 +22,31 @@ int mtBLp = 32;
 int mtBRp = 33;
 //LED燈腳位
 int LEDpin = 13;
-//四軸停滯基數（未調整）
-#define FLconst 200
-#define FRconst 200
-#define BLconst 200
-#define BRconst 200
-//四軸更動數（未調整）
-#define FLvar 50
-#define FRvar 50
-#define BLvar 50
-#define BRvar 50
+//飛行常數
+int flyconst 200
+int HighPoint = 50;
+int LowPoint = -50;
+//四軸微調倍率（未調整完畢）
+int FLvar = 1.002;
+int FRvar = 1.004;
+int BLvar = 0.998;
+int BRvar = 0.999;
+//各軸常數=飛行常數+微調倍率
+int FLconst = flyconst*FLvar;
+int FRconst = flyconst*FRvar;
+int BLconst = flyconst*BLvar;
+int BRconst = flyconst*BRvar;
+//各軸高位=各軸常數+高位常數*微調倍率
+int FLhigh = (FLconst+HighPoint)*FLvar;
+int FRhigh = (FRconst+HighPoint)*FRvar;
+int BLhigh = (BLconst+HighPoint)*BLvar;
+int BRhigh = (BRLconst+HighPoint)*BRvar;
+//各軸低位=各軸常數+低位常數-微調倍率
+int FLlow = (FLconst+LowPoint)*FLvar;
+int FRlow = (FLconst+LowPoint)*FRvar;
+int BLlow = (FLconst+LowPoint)*BLvar;
+int BRlow = (FLconst+LowPoint)*BRvar;
+
 void setup() {
   pinMode(mtFLp, OUTPUT);
   pinMode(mtFRp, OUTPUT);
@@ -139,80 +155,80 @@ html+="</html>";
 void Front() {
   analogWrite(mtFLp, FLconst);
   analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLconst + BLvar);
-  analogWrite(mtBRp, BRconst + BRvar);
+  analogWrite(mtBLp, BLhigh);
+  analogWrite(mtBRp, BRhigh);
   Serial.println("F");
   digitalWrite(13,HIGH);
   delay(1000);
 }
 void B() {
-  analogWrite(mtFLp, FLconst + FLvar);
-  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtFLp, FLhigh);
+  analogWrite(mtFRp, FRhigh);
   analogWrite(mtBLp, BLconst);
   analogWrite(mtBRp, BRconst);
   Serial.println("B");
 }
 void L() {
   analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRconst + FRvar);
+  analogWrite(mtFRp, FRhigh);
   analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRconst + BRvar);
+  analogWrite(mtBRp, BRhigh);
   Serial.println("L");
 }
 void R() {
-  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFLp, FLhigh);
   analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtBLp, BLhigh);
   analogWrite(mtBRp, BRconst);
   Serial.println("R");
 }
 void FL() {
-  analogWrite(mtFLp, FLconst - FLvar);
+  analogWrite(mtFLp, FLlow);
   analogWrite(mtFRp, FRconst);
   analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRconst + BRvar);
+  analogWrite(mtBRp, BRhigh);
 }
 void FR() {
   analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRconst - FRvar);
-  analogWrite(mtBLp, BLconst + BLvar);
+  analogWrite(mtFRp, FRlow);
+  analogWrite(mtBLp, BLhigh);
   analogWrite(mtBRp, BRconst);
 }
 void BL() {
   analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRconst + FRvar);
-  analogWrite(mtBLp, BLconst - BLvar);
+  analogWrite(mtFRp, FRhigh);
+  analogWrite(mtBLp, BLlow);
   analogWrite(mtBRp, BRconst);
 }
 void BackRight() {
-  analogWrite(mtFLp, FLconst + FLvar);
+  analogWrite(mtFLp, FLhigh);
   analogWrite(mtFRp, FRconst);
   analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRconst - BRvar);
+  analogWrite(mtBRp, BRlow);
 }
 void UP() {
-  analogWrite(mtFLp, FLconst + FLvar);
-  analogWrite(mtFRp, FRconst + FRvar);
-  analogWrite(mtBLp, BLconst + BLvar);
-  analogWrite(mtBRp, BRconst + BRvar);
+  analogWrite(mtFLp, FLhigh);
+  analogWrite(mtFRp, FRhigh);
+  analogWrite(mtBLp, BLhigh);
+  analogWrite(mtBRp, BRhigh);
 }
 void DN() {
-  analogWrite(mtFLp, FLconst - FLvar);
-  analogWrite(mtFRp, FRconst - FRvar);
-  analogWrite(mtBLp, BLconst - BLvar);
-  analogWrite(mtBRp, BRconst - BRvar);
+  analogWrite(mtFLp, FLlow);
+  analogWrite(mtFRp, FRlow);
+  analogWrite(mtBLp, BLlow);
+  analogWrite(mtBRp, BRl);
 }
 void LRo() {
-  analogWrite(mtFLp, FLconst - FLvar);
-  analogWrite(mtFRp, FRconst + FRvar);
-  analogWrite(mtBLp, BLconst + BLvar);
-  analogWrite(mtBRp, BRconst - BRvar);
+  analogWrite(mtFLp, FLlow);
+  analogWrite(mtFRp, FRhigh);
+  analogWrite(mtBLp, BLhigh);
+  analogWrite(mtBRp, BRlow);
 }
 void RRo() {
-  analogWrite(mtFLp, FLconst + FLvar);
-  analogWrite(mtFRp, FRconst - FRvar);
-  analogWrite(mtBLp, BLconst - BLvar);
-  analogWrite(mtBRp, BRconst + BRvar);
+  analogWrite(mtFLp, FLhigh);
+  analogWrite(mtFRp, FRl);
+  analogWrite(mtBLp, BLlow);
+  analogWrite(mtBRp, BRhigh);
 }
 void S() {
   analogWrite(mtFLp, FLconst);
