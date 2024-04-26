@@ -32,7 +32,8 @@ int mtBLp = 25;
 //右後馬達
 int mtBRp = 33;
 //LED燈腳位
-int LEDpin = 13;
+int LEDpin = 15;
+int LEDlow = 13;
 int enable = 32;
 //飛行常數
 int flyconst = 200;
@@ -66,6 +67,7 @@ void setup() {
   pinMode(mtBRp, OUTPUT);
   pinMode(LEDpin, OUTPUT);
   pinMode(enable, OUTPUT);
+  pinMode(LEDlow, OUTPUT);
   pinMode(26,OUTPUT);
   Serial.begin(115200);
 
@@ -100,7 +102,7 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(enable,HIGH);
+  digitalWrite(enable,LOW);
   digitalWrite(26,LOW);
   server.handleClient();  // 處理網路請求
 }
@@ -174,7 +176,8 @@ void Front() {
   analogWrite(mtBLp, BLhigh);
   analogWrite(mtBRp, BRhigh);
   Serial.println("F");
-  digitalWrite(13,HIGH);
+  digitalWrite(15, HIGH);
+  digitalWrite(13, LOW);
   delay(1000);
 }
 void B() {
