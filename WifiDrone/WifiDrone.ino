@@ -38,6 +38,8 @@ int mtBLp = 25;
 int mtBRp = 18;
 //LED燈腳位
 int LEDpin = 13;
+//enable腳位
+int enable = 15;
 //飛行常數
 int flyconst = 200;
 int HighPoint = 50;
@@ -73,6 +75,7 @@ void setup() {
   ledcAttachPin(mtBLp, ChanBL);
   ledcAttachPin(mtBRp, ChanBR);
   pinMode(LEDpin, OUTPUT);
+  pinMode(enable,OUTPUT);
   Serial.begin(115200);
 
   // 設定 ESP32 為 AP 模式
@@ -106,6 +109,7 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(enable, HIGH);
   server.handleClient();  // 處理網路請求
 }
 
