@@ -11,8 +11,7 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);    //可選
 IPAddress secondaryDNS(8, 8, 4, 4);  //可選
-WebServer server(80);                // 建立一個 WebServer 物件，監聽在 85 port
-//一堆定義不用理會
+WebServer server(80);                // 建立一個 WebServer 物件，監聽在 80 port
 /*
 F:front
 B:back
@@ -30,13 +29,13 @@ int ChanBL = 2;
 int ChanBR = 3;
 int Res = 8;
 //左前馬達
-int mtFLp = 34;
+int mtFLp = 18;
 //右前馬達
-int mtFRp = 35;
+int mtFRp = 5;
 //左後馬達
-int mtBLp = 32;
+int mtBLp = 25;
 //右後馬達
-int mtBRp = 33;
+int mtBRp = 18;
 //LED燈腳位
 int LEDpin = 13;
 //飛行常數
