@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
 
@@ -10,7 +11,7 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);    //可選
 IPAddress secondaryDNS(8, 8, 4, 4);  //可選
-WebServer server(85);                // 建立一個 WebServer 物件，監聽在 85 port
+WebServer server(80);                // 建立一個 WebServer 物件，監聽在 85 port
 //一堆定義不用理會
 /*
 F:front
@@ -22,6 +23,12 @@ UP:up
 DN:down
 S:Stop
 */
+int Freq = 5000;
+int ChanFL = 0;
+int ChanFR = 1;
+int ChanBL = 2;
+int ChanBR = 3;
+int Res = 8;
 //左前馬達
 int mtFLp = 34;
 //右前馬達
@@ -33,7 +40,7 @@ int mtBRp = 33;
 //LED燈腳位
 int LEDpin = 13;
 //飛行常數
-int flyconst 200
+int flyconst = 200;
 int HighPoint = 50;
 int LowPoint = -50;
 //四軸微調倍率（未調整完畢）
@@ -50,7 +57,7 @@ int BRconst = flyconst*BRvar;
 int FLhigh = (FLconst+HighPoint)*FLvar;
 int FRhigh = (FRconst+HighPoint)*FRvar;
 int BLhigh = (BLconst+HighPoint)*BLvar;
-int BRhigh = (BRLconst+HighPoint)*BRvar;
+int BRhigh = (BRconst+HighPoint)*BRvar;
 //各軸低位=各軸常數+低位常數-微調倍率
 int FLlow = (FLconst+LowPoint)*FLvar;
 int FRlow = (FLconst+LowPoint)*FRvar;
@@ -58,10 +65,14 @@ int BLlow = (FLconst+LowPoint)*BLvar;
 int BRlow = (FLconst+LowPoint)*BRvar;
 
 void setup() {
-  pinMode(mtFLp, OUTPUT);
-  pinMode(mtFRp, OUTPUT);
-  pinMode(mtBLp, OUTPUT);
-  pinMode(mtBRp, OUTPUT);
+  ledcSetup(ChanFL, Freq, Res);
+  ledcSetup(ChanFR, Freq, Res);
+  ledcSetup(ChanBL, Freq, Res);
+  ledcSetup(ChanBR, Freq, Res);
+  ledcAttachPin(mtFLp, ChanFL);
+  ledcAttachPin(mtFRp, ChanFR);
+  ledcAttachPin(mtBLp, ChanBL);
+  ledcAttachPin(mtBRp, ChanBR);
   pinMode(LEDpin, OUTPUT);
   Serial.begin(115200);
 
@@ -163,88 +174,88 @@ html+="</html>";
   server.send(200, "text/html", html);
 }
 void Front() {
-  analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLhigh);
-  analogWrite(mtBRp, BRhigh);
+  ledcWrite(ChanFL, FLconst);
+  ledcWrite(ChanFR, FRconst);
+  ledcWrite(ChanBL, BLhigh);
+  ledcWrite(ChanBR, BRhigh);
   Serial.println("F");
   digitalWrite(13,HIGH);
   delay(1000);
 }
 void B() {
-  analogWrite(mtFLp, FLhigh);
-  analogWrite(mtFRp, FRhigh);
-  analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRconst);
+  ledcWrite(ChanFL, FLhigh);
+  ledcWrite(ChanFR, FRhigh);
+  ledcWrite(ChanBL, BLconst);
+  ledcWrite(ChanBR, BRconst);
   Serial.println("B");
 }
 void L() {
-  analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRhigh);
-  analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRhigh);
+  ledcWrite(ChanFL, FLconst);
+  ledcWrite(ChanFR, FRhigh);
+  ledcWrite(ChanBL, BLconst);
+  ledcWrite(ChanBR, BRhigh);
   Serial.println("L");
 }
 void R() {
-  analogWrite(mtFLp, FLhigh);
-  analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLhigh);
-  analogWrite(mtBRp, BRconst);
+  ledcWrite(ChanFL, FLhigh);
+  ledcWrite(ChanFR, FRconst);
+  ledcWrite(ChanBL, BLhigh);
+  ledcWrite(ChanBR, BRconst);
   Serial.println("R");
 }
 void FL() {
-  analogWrite(mtFLp, FLlow);
-  analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRhigh);
+  ledcWrite(ChanFL, FLlow);
+  ledcWrite(ChanFR, FRconst);
+  ledcWrite(ChanBL, BLconst);
+  ledcWrite(ChanBR, BRhigh);
 }
 void FR() {
-  analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRlow);
-  analogWrite(mtBLp, BLhigh);
-  analogWrite(mtBRp, BRconst);
+  ledcWrite(ChanFL, FLconst);
+  ledcWrite(ChanFR, FRlow);
+  ledcWrite(ChanBL, BLhigh);
+  ledcWrite(ChanBR, BRconst);
 }
 void BL() {
-  analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRhigh);
-  analogWrite(mtBLp, BLlow);
-  analogWrite(mtBRp, BRconst);
+  ledcWrite(ChanFL, FLconst);
+  ledcWrite(ChanFR, FRhigh);
+  ledcWrite(ChanBL, BLlow);
+  ledcWrite(ChanBR, BRconst);
 }
 void BackRight() {
-  analogWrite(mtFLp, FLhigh);
-  analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRlow);
+  ledcWrite(ChanFL, FLhigh);
+  ledcWrite(ChanFR, FRconst);
+  ledcWrite(ChanBL, BLconst);
+  ledcWrite(ChanBR, BRlow);
 }
 void UP() {
-  analogWrite(mtFLp, FLhigh);
-  analogWrite(mtFRp, FRhigh);
-  analogWrite(mtBLp, BLhigh);
-  analogWrite(mtBRp, BRhigh);
+  ledcWrite(ChanFL, FLhigh);
+  ledcWrite(ChanFR, FRhigh);
+  ledcWrite(ChanBL, BLhigh);
+  ledcWrite(ChanBR, BRhigh);
 }
 void DN() {
-  analogWrite(mtFLp, FLlow);
-  analogWrite(mtFRp, FRlow);
-  analogWrite(mtBLp, BLlow);
-  analogWrite(mtBRp, BRl);
+  ledcWrite(ChanFL, FLlow);
+  ledcWrite(ChanFR, FRlow);
+  ledcWrite(ChanBL, BLlow);
+  ledcWrite(ChanBR, BRlow);
 }
 void LRo() {
-  analogWrite(mtFLp, FLlow);
-  analogWrite(mtFRp, FRhigh);
-  analogWrite(mtBLp, BLhigh);
-  analogWrite(mtBRp, BRlow);
+  ledcWrite(ChanFL, FLlow);
+  ledcWrite(ChanFR, FRhigh);
+  ledcWrite(ChanBL, BLhigh);
+  ledcWrite(ChanBR, BRlow);
 }
 void RRo() {
-  analogWrite(mtFLp, FLhigh);
-  analogWrite(mtFRp, FRl);
-  analogWrite(mtBLp, BLlow);
-  analogWrite(mtBRp, BRhigh);
+  ledcWrite(ChanFL, FLhigh);
+  ledcWrite(ChanFR, FRlow);
+  ledcWrite(ChanBL, BLlow);
+  ledcWrite(ChanBR, BRhigh);
 }
 void S() {
-  analogWrite(mtFLp, FLconst);
-  analogWrite(mtFRp, FRconst);
-  analogWrite(mtBLp, BLconst);
-  analogWrite(mtBRp, BRconst);
+  ledcWrite(ChanFL, 0);
+  ledcWrite(ChanFR, 0);
+  ledcWrite(ChanBL, 0);
+  ledcWrite(ChanBR, 0);
   digitalWrite(13,LOW);
   delay(1000);
 }
