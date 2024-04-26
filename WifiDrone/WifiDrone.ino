@@ -102,7 +102,7 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(enable,LOW);
+  digitalWrite(enable,HIGH);
   digitalWrite(26,LOW);
   server.handleClient();  // 處理網路請求
 }
