@@ -24,11 +24,11 @@ DN:down
 S:Stop
 */
 //左前馬達
-int mtFLp = 34;
+int mtFLp = 18;
 //右前馬達
-int mtFRp = 35;
+int mtFRp = 5;
 //左後馬達
-int mtBLp = 32;
+int mtBLp = 25;
 //右後馬達
 int mtBRp = 33;
 //LED燈腳位
